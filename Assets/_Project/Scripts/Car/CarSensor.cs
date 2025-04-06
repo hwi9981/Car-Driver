@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CarSensor : MonoBehaviour
@@ -12,7 +13,17 @@ public class CarSensor : MonoBehaviour
     public bool showGizmos = true;
     public float[] sensorOutputs; // Kết quả các cảm biến (dùng cho input NN)
 
+    private void Awake()
+    {
+        DoSensor();
+    }
+
     void FixedUpdate()
+    {
+        DoSensor();
+    }
+
+    void DoSensor()
     {
         sensorOutputs = new float[sensorCount];
 
