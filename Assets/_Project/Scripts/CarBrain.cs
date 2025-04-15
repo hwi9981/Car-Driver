@@ -45,6 +45,7 @@ public class CarBrain : MonoBehaviour
         
         // TO DO replace this with GA
         neuralNetwork.Randomize();
+        
     }
 
 

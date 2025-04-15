@@ -20,11 +20,11 @@ public class CarController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
-    {
-        accelInput = Input.GetAxis("Vertical");   // W/S hoặc ↑/↓
-        steerInput = -Input.GetAxis("Horizontal");
-    }
+    // void Update()
+    // {
+    //     accelInput = Input.GetAxis("Vertical");   // W/S hoặc ↑/↓
+    //     steerInput = -Input.GetAxis("Horizontal");
+    // }
 
     void FixedUpdate()
     {
@@ -34,7 +34,7 @@ public class CarController : MonoBehaviour
         rb.velocity = forwardVelocity + rightVelocity * driftFactor;
 
         // Tăng tốc
-        rb.AddForce(transform.up * accelInput * acceleration);
+        rb.AddForce(transform.up * (accelInput * acceleration));
 
         // Giới hạn tốc độ tối đa
         if (rb.velocity.magnitude > maxSpeed)
