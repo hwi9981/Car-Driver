@@ -34,5 +34,47 @@ namespace Algorithm.NeuralNetwork
             // (có thể thêm sau nếu bạn cần)
             return null;
         }
+        public float[] EncodeToGene()
+        {
+            var genes = new List<float>();
+            foreach (var layer in Layers)
+            {
+                int inCount = layer.Weights.GetLength(0);
+                int outCount = layer.Weights.GetLength(1);
+                for (int i = 0; i < inCount; i++)
+                for (int j = 0; j < outCount; j++)
+                    genes.Add(layer.Weights[i, j]);
+                for (int j = 0; j < outCount; j++)
+                    genes.Add(layer.Biases[j]);
+            }
+            return genes.ToArray();
+        }
+
+        public void DecodeFromGene(float[] gene)
+        {
+            int index = 0;
+            foreach (var layer in Layers)
+            {
+                int inCount = layer.Weights.GetLength(0);
+                int outCount = layer.Weights.GetLength(1);
+                for (int i = 0; i < inCount; i++)
+                for (int j = 0; j < outCount; j++)
+                    layer.Weights[i, j] = gene[index++];
+                for (int j = 0; j < outCount; j++)
+                    layer.Biases[j] = gene[index++];
+            }
+        }
+
+        public int GetGeneLength()
+        {
+            int length = 0;
+            foreach (var layer in Layers)
+            {
+                int inCount = layer.Weights.GetLength(0);
+                int outCount = layer.Weights.GetLength(1);
+                length += inCount * outCount + outCount;
+            }
+            return length;
+        }
     }
 }

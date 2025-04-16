@@ -51,15 +51,30 @@ public class CarBrain : MonoBehaviour
 
     #region Genertic Algorithm
     // communicate with GA
-    public void EncodeToGene(NeuralNetwork neuralNetwork)
+    // Encode neural network parameters into a gene array
+    public float[] EncodeToGene()
     {
-        var layers = neuralNetwork.Layers;
+        return neuralNetwork.EncodeToGene();
     }
 
-    public void DecodeFromGene()
+    // Decode a gene array back into the neural network parameters
+    public void DecodeFromGene(float[] gene)
     {
-        
+        neuralNetwork.DecodeFromGene(gene);
     }
+
+    [ContextMenu("Debug Gene")]
+    void DebugGene()
+    {
+        var gene = EncodeToGene();
+        var outputString = "";
+        for (int i = 0; i < gene.Length; i++)
+        {
+            outputString += gene[i] + " ";
+        }
+        Debug.Log(outputString);
+    }
+    
     #endregion
 
     
