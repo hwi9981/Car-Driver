@@ -11,14 +11,10 @@ public class CarController : MonoBehaviour
     public float steering = 2f;
     public float driftFactor = 0.95f;
 
-    private Rigidbody2D rb;
-    private float steerInput;
-    private float accelInput;
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
+    [Header("References")]
+    public Rigidbody2D rb;
+    private float _steerInput;
+    private float _accelInput;
 
     // void Update()
     // {
@@ -34,7 +30,7 @@ public class CarController : MonoBehaviour
         rb.velocity = forwardVelocity + rightVelocity * driftFactor;
 
         // Tăng tốc
-        rb.AddForce(transform.up * (accelInput * acceleration));
+        rb.AddForce(transform.up * (_accelInput * acceleration));
 
         // Giới hạn tốc độ tối đa
         if (rb.velocity.magnitude > maxSpeed)
@@ -42,24 +38,26 @@ public class CarController : MonoBehaviour
 
         // Quay xe
         float speedFactor = rb.velocity.magnitude / maxSpeed;
-        rb.rotation += steerInput * steering * speedFactor;
+        rb.rotation += _steerInput * steering * speedFactor;
     }
 
     // API cho Neural Network điều khiển
     public void SetAcceleration(float value)
     {
-        accelInput = Mathf.Clamp(value, -1f, 1f); // -1 là giảm tốc, 1 là tăng tốc
+        _accelInput = Mathf.Clamp(value, -1f, 1f); // -1 là giảm tốc, 1 là tăng tốc
     }
 
     public void SetSteering(float value)
     {
-        steerInput = Mathf.Clamp(value, -1f, 1f); // -1 là rẽ trái, 1 là rẽ phải
+        _steerInput = Mathf.Clamp(value, -1f, 1f); // -1 là rẽ trái, 1 là rẽ phải
     }
 
     public void StopCar()
     {
-        accelInput = 0;  // Dừng tăng tốc
-        steerInput = 0;  // Dừng quay
+        _accelInput = 0;  // Dừng tăng tốc
+        _steerInput = 0;  // Dừng quay
+        rb.velocity = Vector2.zero;  // Dừng di chuyển
+        rb.angularVelocity = 0;  // Dừng quay xe
     }
 
     // API lấy thông tin từ xe (ví dụ: tốc độ, góc quay, v.v.)

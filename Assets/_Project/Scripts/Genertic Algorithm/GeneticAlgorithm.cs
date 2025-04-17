@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Jigsaw_Puzzle.Scripts
+namespace Algorithm.GeneticAlgorithm
 {
     public class GeneticAlgorithm<T>
     {
@@ -39,6 +39,10 @@ namespace Jigsaw_Puzzle.Scripts
                 Population.Add(dna);
             }
         }
+        public void CreatePopulation(List<DNA<T>> population)
+        {
+            Population = new List<DNA<T>>(population);
+        }
 
         public void NewGeneration()
         {
@@ -60,8 +64,9 @@ namespace Jigsaw_Puzzle.Scripts
                 }
                 else
                 {
-                    ChooseParent(out var parent1, out var parent2);
-
+                    // ChooseParent(out var parent1, out var parent2);
+                    var parent1 = ChooseParent();
+                    var parent2 = ChooseParent();
                     // var child = parent1;
                     var child = parent1.Crossover(parent2);
                     child.Mutate(MutationRate);

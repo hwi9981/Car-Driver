@@ -1,13 +1,30 @@
-﻿using Algorithm.NeuralNetwork;
+﻿using System;
+using Algorithm.NeuralNetwork;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CarBrain : MonoBehaviour
 {
+    
     public NeuralNetwork neuralNetwork;
     public CarSensor carSensor;
     public CarController carController;
 
-    void Start()
+    public SpriteRenderer _carSprite;
+
+    public System.Action OnHitWall;
+    private bool _active = true;
+    private bool _isInited = false;
+    public bool IsActive() => _active;
+    private void Start()
+    {
+        if (!_isInited)
+        {
+            InitNN();
+        }
+    }
+
+    public void InitNN()
     {
         var inputLayerNodeCount = carSensor.sensorCount + 1;// +1 for current car speed
         var hiddenLayerNodeCount = inputLayerNodeCount;
@@ -16,10 +33,36 @@ public class CarBrain : MonoBehaviour
         
         neuralNetwork = new NeuralNetwork(structure);
         
+        // OnHitWall += Stop;
+        _isInited = true;
+    }
+    // private void OnDestroy()
+    // {
+    //     OnHitWall -= Stop;
+    // }
+    public void Run()
+    {
+        _active = true;
+        _carSprite.color = Color.white;
+    }
+
+    private void Stop()
+    {
+        carController.StopCar();
+        _carSprite.color = new Color(1, 1, 1, 0.5f);
+        _active = false;
+        Debug.Log("Car stopped");
+    }
+
+    public void RandomizeNN()
+    {
+        neuralNetwork.Randomize();
     }
     // dựa vao input để đưa ra quyết định
     void FixedUpdate()
     {
+        if (!_isInited) return;
+        if (!_active) return;
         // B1: Lấy input từ sensor và tốc độ hiện tại
         float[] sensorData = carSensor.GetSensorData();
         float[] inputs = new float[sensorData.Length + 1];
@@ -44,7 +87,7 @@ public class CarBrain : MonoBehaviour
         carController.SetSteering(steering);
         
         // TO DO replace this with GA
-        neuralNetwork.Randomize();
+        
         
     }
 
@@ -63,20 +106,17 @@ public class CarBrain : MonoBehaviour
         neuralNetwork.DecodeFromGene(gene);
     }
 
-    [ContextMenu("Debug Gene")]
-    void DebugGene()
-    {
-        var gene = EncodeToGene();
-        var outputString = "";
-        for (int i = 0; i < gene.Length; i++)
-        {
-            outputString += gene[i] + " ";
-        }
-        Debug.Log(outputString);
-    }
-    
+    public int CaculateDNASize() => neuralNetwork.GetGeneLength();
     #endregion
 
-    
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (_active)
+        {
+            Stop();
+            OnHitWall?.Invoke();
+        }
+            
+    }
     
 }

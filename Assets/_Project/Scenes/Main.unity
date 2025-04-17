@@ -123,6 +123,55 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &5693507
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5693508}
+  - component: {fileID: 5693509}
+  m_Layer: 0
+  m_Name: Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5693508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693507}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5693509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b429dcfdc1ed257458495c1f7fec23bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  populationSize: 100
+  maxGenerations: 100
+  mutationRate: 0.05
+  carPrefab: {fileID: 2086360684}
+  trackGenerator: {fileID: 27550437}
 --- !u!1 &27550434
 GameObject:
   m_ObjectHideFlags: 0
@@ -2779,13 +2828,13 @@ GameObject:
   - component: {fileID: 2086360679}
   - component: {fileID: 2086360678}
   - component: {fileID: 2086360682}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Car
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &2086360678
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2881,6 +2930,7 @@ MonoBehaviour:
   maxSpeed: 10
   steering: 5
   driftFactor: 0.95
+  rb: {fileID: 2086360679}
 --- !u!4 &2086360681
 Transform:
   m_ObjectHideFlags: 0
@@ -2959,7 +3009,7 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
-  showGizmos: 1
+  showGizmos: 0
   sensorOutputs: []
 --- !u!114 &2086360684
 MonoBehaviour:
@@ -2975,6 +3025,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   carSensor: {fileID: 2086360683}
   carController: {fileID: 2086360680}
+  _carSprite: {fileID: 2086360678}
 --- !u!1 &2103668794
 GameObject:
   m_ObjectHideFlags: 0
@@ -3155,3 +3206,4 @@ SceneRoots:
   - {fileID: 884768180}
   - {fileID: 2086360681}
   - {fileID: 27550436}
+  - {fileID: 5693508}

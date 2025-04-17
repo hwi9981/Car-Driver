@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class CarSensor : MonoBehaviour
 {
+    
     [Header("Sensor Settings")]
     public int sensorCount = 5; // Số lượng cảm biến (ví dụ: 5)
     public float sensorLength = 10f; // Độ dài tối đa của cảm biến

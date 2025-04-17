@@ -21,11 +21,14 @@ public class TrackGenerator : MonoBehaviour
     [Header("Start/Finish Line")]
     public GameObject startLinePrefab;
     private GameObject startLineInstance;
-
+    
+    public List<Vector2> trackPoints = new List<Vector2>();
+    
+    public GameObject GetStartLine() => startLineInstance;
 
     private LineRenderer lineRenderer;
 
-    void Start()
+    void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
         GenerateTrack();
@@ -75,6 +78,7 @@ public class TrackGenerator : MonoBehaviour
         
         PlaceStartLine(smoothCenter);
 
+        trackPoints = new List<Vector2>(smoothCenter);
     }
 
     List<Vector2> GenerateRandomCirclePoints()
@@ -138,5 +142,24 @@ public class TrackGenerator : MonoBehaviour
         // Tạo vạch mới
         startLineInstance = Instantiate(startLinePrefab, pos, Quaternion.Euler(0, 0, angle), transform);
     }
+    
+    void OnDrawGizmos()
+    {
+        if (trackPoints == null || trackPoints.Count == 0)
+            return;
+
+        Gizmos.color = Color.yellow;
+        float size = 0.2f;
+
+        for (int i = 0; i < trackPoints.Count; i++)
+        {
+            Gizmos.DrawSphere(trackPoints[i], size);
+
+            // Vẽ line nối giữa các track point để dễ theo dõi
+            Vector2 next = trackPoints[(i + 1) % trackPoints.Count];
+            Gizmos.DrawLine(trackPoints[i], next);
+        }
+    }
+
 
 }
