@@ -8,12 +8,14 @@ namespace Algorithm.GeneticAlgorithm
 {
     public class GeneticAlgorithm<T>
     {
-        public List<DNA<T>> Population { get; private set; }
+        public List<DNA<T>> Population { get; set; }
         public int Generation { get; private set; }
         public float MutationRate { get; set; }
         
         public float BestFitness { get; private set; }
         public T[] BestGenes { get; private set; }
+        
+        public int BestIndividualIndex { get; private set; }
         
         private List<DNA<T>> _newPopulation = new List<DNA<T>>();
         private float _fitnessSum = 0;
@@ -81,12 +83,14 @@ namespace Algorithm.GeneticAlgorithm
         {
             _fitnessSum = 0;
             DNA<T> best = Population[0];
+            BestIndividualIndex = 0;
             for (int i = 0; i < Population.Count; i++)
             {
                 _fitnessSum += Population[i].CalculateFitness(i);
                 if (Population[i].Fitness > best.Fitness)
                 {
                     best = Population[i];
+                    BestIndividualIndex = i;
                 }
             }
             BestFitness = best.Fitness;

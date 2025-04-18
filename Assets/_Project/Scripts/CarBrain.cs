@@ -53,7 +53,7 @@ public class CarBrain : MonoBehaviour
         carController.StopCar();
         _carSprite.color = new Color(1, 1, 1, 0.5f);
         _active = false;
-        Debug.Log("Car stopped");
+        // Debug.Log("Car stopped");
     }
 
     public void RandomizeNN()
@@ -90,6 +90,12 @@ public class CarBrain : MonoBehaviour
         
         // TO DO replace this with GA
         if (carCheckpoint.isTimedOut)
+        {
+            Stop();
+            OnHitWall?.Invoke();
+        }
+
+        if (carCheckpoint.IsLapFinished())
         {
             Stop();
             OnHitWall?.Invoke();

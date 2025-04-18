@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Algorithm.GeneticAlgorithm;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,9 +17,19 @@ public class GameController : MonoBehaviour
     public CarBrain carPrefab;
     public TrackGenerator trackGenerator;
     
+    [Header("For Debug")]
+    public TMP_Text generationText;
+    public TMP_Text mutationText;
+    public TMP_Text bestCarCheckpointText;
+    public TMP_Text bestCarTimeText;
+    
+    
     private GeneticAlgorithm<float> _ga;
 
     private List<CarBrain> _carPopulation = new List<CarBrain>();
+    
+    private int _bestCheckPoint = 0;
+    private float _bestTime = 0f;
     private void Start()
     {
         var startLine = trackGenerator.GetStartLine();
@@ -42,6 +53,23 @@ public class GameController : MonoBehaviour
     void Update()
     {
         Time.timeScale = speed;
+        
+        foreach (var car in _carPopulation)
+        {
+            if (_bestCheckPoint < car.carCheckpoint.GetTotalCheckpointsPassed())
+            {
+                _bestCheckPoint = car.carCheckpoint.GetTotalCheckpointsPassed();
+            }
+
+            if (car.carCheckpoint.IsLapFinished())
+            {
+                if (_bestTime > car.carCheckpoint.GetTotalLapTime() || _bestTime == 0)
+                {
+                    _bestTime = car.carCheckpoint.GetTotalLapTime();
+                }
+            }
+        }
+        UpdateProgressAlgorithm();
     }
 
     private void CheckAllCarActive()
@@ -54,6 +82,13 @@ public class GameController : MonoBehaviour
             UpdateIndiviualNN();
             NewRun();
         }
+    }
+
+    public void ForceNextRun()
+    {
+        _ga.NewGeneration();
+        UpdateIndiviualNN();
+        NewRun();
     }
 
     private bool HasCarActive()
@@ -69,15 +104,31 @@ public class GameController : MonoBehaviour
     // for mutation
     float GetRandomWeight() => Random.Range(-1f, 1f);
     // Caculate fitness
+    // private float EvaluateFitness(int index)
+    // {
+    //     return _carPopulation[index].carCheckpoint.GetTotalCheckpointsPassed();
+    // }
     private float EvaluateFitness(int index)
     {
-        // float score = 0;
-        // var car = _carPopulation[index];
-        // return Random.Range(0, 100);
-        // return score;
+        var car = _carPopulation[index].carCheckpoint;
 
-        return _carPopulation[index].carCheckpoint.GetTotalCheckpointsPassed();
+        int passed = car.GetTotalCheckpointsPassed();
+        float time = car.GetTotalLapTime(); // hoặc thời gian đã chạy nếu chưa hoàn thành
+
+        if (car.IsTimedOut())
+            return 0.01f;
+
+        float fitness = passed / (time + 0.001f);
+
+        if (car.IsLapFinished())
+        {
+            fitness += 20f; // bonus cho lap hoàn thành
+        }
+
+        return fitness;
     }
+
+
 
     void UpdateIndiviualNN()
     {
@@ -96,4 +147,61 @@ public class GameController : MonoBehaviour
             _carPopulation[i].Run();
         }
     }
+
+    #region Debug Algorithm
+
+    void UpdateProgressAlgorithm()
+    {
+        generationText.text = _ga.Generation.ToString();
+        mutationText.text = mutationRate.ToString();
+        bestCarCheckpointText.text = _bestCheckPoint.ToString();
+        bestCarTimeText.text = _bestTime.ToString("F2");
+    }
+
+    #endregion
+
+    #region Save and Load
+
+    public void SaveCurrent()
+    {
+        // var filename = "data_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".json";
+        // SaveGenesToJson(filename);
+        
+        // Lấy số lượng lần lưu trữ đã thực hiện từ PlayerPrefs
+        int saveCount = PlayerPrefs.GetInt("SaveCount", 0) + 1;
+
+        // Tạo tên file mới
+        var filename = saveCount + ".json";
+
+        // Lưu trữ tên file mới vào PlayerPrefs
+        PlayerPrefs.SetInt("SaveCount", saveCount);
+        PlayerPrefs.Save();
+
+        // Gọi phương thức lưu trữ gen
+        SaveGenesToJson(filename);
+    }
+
+    public void SaveGenesToJson(string fileName = "saved_genes.json")
+    {
+        var data = new GenerationData();
+        foreach (var t in _carPopulation)
+        {
+            data.population.Add(new IndividualData() { genes = t.EncodeToGene() });
+        }
+        GeneticSaveLoadSystem.SaveGenerationData(fileName, data);
+    }
+    public void LoadGenesToPopulation(GenerationData data)
+    {
+        for (int i = 0; i < Mathf.Min(_carPopulation.Count, data.population.Count); i++)
+        {
+            // _carPopulation[i].DecodeFromGene(data.population[i].genes);
+            // newData.Add(data.population[i].genes);
+            _ga.Population[i].Genes = data.population[i].genes;
+        }
+        ForceNextRun();
+    }
+
+    
+
+    #endregion
 }
