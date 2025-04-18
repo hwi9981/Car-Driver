@@ -92,9 +92,22 @@ namespace Algorithm.GeneticAlgorithm
             BestFitness = best.Fitness;
             best.Genes.CopyTo(BestGenes, 0);
         }
+        // private DNA<T> ChooseParent()
+        // {
+        //     // high fitness has higher chance to be chosen
+        //     var randomValue = Random.value * _fitnessSum;
+        //     for (int i = 0; i < Population.Count; i++)
+        //     {
+        //         if (randomValue < Population[i].Fitness)
+        //         {
+        //             return Population[i];
+        //         }
+        //         randomValue -= Population[i].Fitness;
+        //     }
+        //     return null;
+        // }
         private DNA<T> ChooseParent()
         {
-            // high fitness has higher chance to be chosen
             var randomValue = Random.value * _fitnessSum;
             for (int i = 0; i < Population.Count; i++)
             {
@@ -104,8 +117,19 @@ namespace Algorithm.GeneticAlgorithm
                 }
                 randomValue -= Population[i].Fitness;
             }
-            return null;
+
+            // Nếu vòng lặp không return được ai (do sai số float chẳng hạn), thì chọn cá thể tốt nhất
+            DNA<T> best = Population[0];
+            for (int i = 1; i < Population.Count; i++)
+            {
+                if (Population[i].Fitness > best.Fitness)
+                {
+                    best = Population[i];
+                }
+            }
+            return best;
         }
+
 
         void ChooseParent(out DNA<T> parent1, out DNA<T> parent2)
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(LineRenderer))]
 public class TrackGenerator : MonoBehaviour
 {
+    public static TrackGenerator Instance;
     [Header("Track Shape")]
     public int numberOfPoints = 12;
     public float radius = 10f;
@@ -32,6 +33,15 @@ public class TrackGenerator : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         GenerateTrack();
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void GenerateTrack()
@@ -77,6 +87,11 @@ public class TrackGenerator : MonoBehaviour
         rightEdge.points = rightPoints.ToArray();
         
         PlaceStartLine(smoothCenter);
+        // Đảm bảo điểm đầu tiên gần với StartLine nhất
+        Vector2 startPos = startLineInstance.transform.position;
+        Vector2 forward = -startLineInstance.transform.right; // hướng mũi tên của startLine
+
+        smoothCenter = RotateListToStartAtClosest(smoothCenter, startPos, forward);
 
         trackPoints = new List<Vector2>(smoothCenter);
     }
@@ -159,6 +174,41 @@ public class TrackGenerator : MonoBehaviour
             Vector2 next = trackPoints[(i + 1) % trackPoints.Count];
             Gizmos.DrawLine(trackPoints[i], next);
         }
+    }
+
+    List<Vector2> RotateListToStartAtClosest(List<Vector2> points, Vector2 startPos, Vector2 forwardDir)
+    {
+        int closestIndex = 0;
+        float minDist = float.MaxValue;
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            float dist = Vector2.Distance(points[i], startPos);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closestIndex = i;
+            }
+        }
+
+        // Xoay danh sách sao cho closestIndex là đầu tiên
+        List<Vector2> rotated = new List<Vector2>();
+        for (int i = 0; i < points.Count; i++)
+        {
+            rotated.Add(points[(i + closestIndex) % points.Count]);
+        }
+
+        // Kiểm tra hướng đi có cùng chiều với startLine không
+        Vector2 dir = (rotated[1] - rotated[0]).normalized;
+        float dot = Vector2.Dot(dir, forwardDir.normalized);
+
+        // Nếu ngược chiều → đảo ngược danh sách
+        if (dot < 0)
+        {
+            rotated.Reverse();
+        }
+
+        return rotated;
     }
 
 

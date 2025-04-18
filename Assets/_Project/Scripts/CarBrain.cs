@@ -9,6 +9,7 @@ public class CarBrain : MonoBehaviour
     public NeuralNetwork neuralNetwork;
     public CarSensor carSensor;
     public CarController carController;
+    public CarCheckpoint carCheckpoint;
 
     public SpriteRenderer _carSprite;
 
@@ -44,6 +45,7 @@ public class CarBrain : MonoBehaviour
     {
         _active = true;
         _carSprite.color = Color.white;
+        carCheckpoint.ResetCheckPoint();
     }
 
     private void Stop()
@@ -87,7 +89,11 @@ public class CarBrain : MonoBehaviour
         carController.SetSteering(steering);
         
         // TO DO replace this with GA
-        
+        if (carCheckpoint.isTimedOut)
+        {
+            Stop();
+            OnHitWall?.Invoke();
+        }
         
     }
 
@@ -107,6 +113,8 @@ public class CarBrain : MonoBehaviour
     }
 
     public int CaculateDNASize() => neuralNetwork.GetGeneLength();
+    
+    
     #endregion
 
     private void OnCollisionEnter2D(Collision2D other)

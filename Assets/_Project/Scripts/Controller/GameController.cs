@@ -71,11 +71,12 @@ public class GameController : MonoBehaviour
     // Caculate fitness
     private float EvaluateFitness(int index)
     {
-        float score = 0;
-        var car = _carPopulation[index];
-        // car.GetFitness();
-        return Random.Range(0, 100);
-        return score;
+        // float score = 0;
+        // var car = _carPopulation[index];
+        // return Random.Range(0, 100);
+        // return score;
+
+        return _carPopulation[index].carCheckpoint.GetTotalCheckpointsPassed();
     }
 
     void UpdateIndiviualNN()
